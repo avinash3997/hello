@@ -46,6 +46,7 @@ export function RoleSidebar({ role }: RoleSidebarProps) {
       <button
         type="button"
         aria-label="Open navigation"
+        aria-expanded={mobileOpen}
         onClick={() => setMobileOpen(true)}
         className="fixed left-4 top-4 z-50 rounded-md border border-border bg-surface p-2 text-ink shadow-sm lg:hidden"
       >
@@ -54,8 +55,8 @@ export function RoleSidebar({ role }: RoleSidebarProps) {
       {mobileOpen && (
         <button aria-label="Close navigation" className="fixed inset-0 z-40 bg-ink/30 lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
-      <aside className={cn(
-        'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all lg:static lg:z-auto',
+      <aside data-role-sidebar="true" className={cn(
+        'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all lg:z-auto',
         collapsed ? 'w-20' : 'w-64',
         mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
       )}>
@@ -80,6 +81,17 @@ export function RoleSidebar({ role }: RoleSidebarProps) {
           })}
         </nav>
       </aside>
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-surface/95 p-2 backdrop-blur lg:hidden" aria-label="Mobile navigation">
+        {links.slice(0, 4).map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(`${href}/`)
+          return (
+            <Link key={href} href={href} onClick={() => setMobileOpen(false)} className={cn('flex min-w-0 flex-1 flex-col items-center gap-1 rounded-md px-1 py-2 text-center text-[11px] font-medium', active ? 'bg-ink text-surface' : 'text-ink/70')}>
+              <Icon className="size-4 shrink-0" />
+              <span className="max-w-full truncate">{label}</span>
+            </Link>
+          )
+        })}
+      </nav>
     </>
   )
 }
