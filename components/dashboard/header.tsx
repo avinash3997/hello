@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { getSession, destroySession } from '@/lib/auth'
+import { RoleSidebar } from '@/components/dashboard/role-sidebar'
 
 async function LogoutButton() {
   return (
@@ -35,11 +36,15 @@ export async function DashboardHeader({
 }: DashboardHeaderProps) {
   const session = await getSession()
 
+  if (!session) return null
+
   return (
-    <header className="bg-surface border-b border-border sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+    <>
+      <RoleSidebar role={session.role} />
+      <header className="bg-surface border-b border-border sticky top-0 z-40 lg:ml-64">
+      <div className="max-w-7xl mx-auto px-4 py-4 pl-16 sm:px-6 lg:px-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/">
+          <Link href={session.role === 'super_admin' ? '/admin/dashboard' : session.role === 'school_admin' ? '/school/dashboard' : session.role === 'teacher' ? '/teacher/dashboard' : '/parent/dashboard'}>
             <div className="w-8 h-8 bg-ink rounded-full flex items-center justify-center hover:opacity-80">
               <span className="text-white font-serif font-bold text-lg">V</span>
             </div>
@@ -67,6 +72,7 @@ export async function DashboardHeader({
           )}
         </div>
       </div>
-    </header>
+      </header>
+    </>
   )
 }

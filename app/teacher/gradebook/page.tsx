@@ -11,6 +11,8 @@ interface Assessment {
   indicatorId: string
   score: 1 | 2 | 3 | 4 | null
   notes: string
+  evidenceUrl: string
+  phase: 'regular' | 'remedial'
 }
 
 const scoreColors: Record<number, { bg: string; text: string; label: string }> = {
@@ -31,6 +33,8 @@ export default function TeacherGradebook() {
       indicatorId: '1',
       score: 4,
       notes: 'Excellent grasp of concepts',
+      evidenceUrl: '',
+      phase: 'regular',
     },
   ])
 
@@ -78,6 +82,8 @@ export default function TeacherGradebook() {
             indicatorId,
             score,
             notes: '',
+            evidenceUrl: '',
+            phase: 'regular',
           },
         ])
       }
@@ -173,7 +179,7 @@ export default function TeacherGradebook() {
                                   indicator.id,
                                   s as 1 | 2 | 3 | 4
                                 )
-                                setSelectedCell(null)
+                                setSelectedCell(cellId)
                               }}
                               className={`w-7 h-7 rounded font-bold text-xs transition-all ${
                                 score === s
@@ -201,6 +207,31 @@ export default function TeacherGradebook() {
           </table>
         </div>
 
+        {selectedCell && (() => {
+          const [studentId, indicatorId] = selectedCell.split('-')
+          const selectedAssessment = getAssessment(studentId, indicatorId)
+          if (!selectedAssessment) return null
+          return (
+            <section className="mt-6 rounded-lg border border-accent/40 bg-surface p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-ink">कैिफयत / Remarks & evidence</h2>
+                  <p className="text-sm text-ink/60">Add evidence for {selectedAssessment.studentName} · indicator {indicatorId}</p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-medium ${scoreColors[selectedAssessment.score ?? 1].bg} ${scoreColors[selectedAssessment.score ?? 1].text}`}>Regular class assessment</span>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <label className="grid gap-2 text-sm font-medium text-ink">कैिफयत / Remarks
+                  <textarea value={selectedAssessment.notes} onChange={(event) => setAssessments((current) => current.map((item) => item.studentId === studentId && item.indicatorId === indicatorId ? { ...item, notes: event.target.value } : item))} className="min-h-24 rounded-md border border-border bg-surface px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-accent" placeholder="Describe observable evidence or support needed" />
+                </label>
+                <label className="grid gap-2 text-sm font-medium text-ink">Evidence URL
+                  <input value={selectedAssessment.evidenceUrl} onChange={(event) => setAssessments((current) => current.map((item) => item.studentId === studentId && item.indicatorId === indicatorId ? { ...item, evidenceUrl: event.target.value } : item))} className="h-10 rounded-md border border-border bg-surface px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-accent" placeholder="https://..." type="url" />
+                </label>
+              </div>
+            </section>
+          )
+        })()}
+
         {/* Save Section */}
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Button
@@ -213,6 +244,7 @@ export default function TeacherGradebook() {
             variant="outline"
             className="text-ink border-ink hover:bg-paper"
             onClick={() => {
+              if (!window.confirm('Reset all entered assessments? This cannot be undone.')) return
               setAssessments([])
               setSaved(false)
             }}
