@@ -3,6 +3,7 @@ import { DataTable } from '@/components/admin/data-table'
 import { getSession } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 export default async function StudentsPage() {
   const session = await getSession()
@@ -85,6 +86,16 @@ export default async function StudentsPage() {
           data={students}
           onAdd={() => {}}
         />
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          {students.slice(0, 3).map((student) => (
+            <Link key={student.id} href={`/school/students/profile/${student.id}`}>
+              <Button variant="outline" className="border-ink text-ink hover:bg-paper">
+                Open {student.name}&apos;s profile
+              </Button>
+            </Link>
+          ))}
+        </div>
 
         {/* Parent Links */}
         <div className="mt-8 bg-surface rounded-lg border border-border p-6">
