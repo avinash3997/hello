@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { ConfirmButton } from '@/components/ConfirmButton'
 
 interface Indicator {
   id: string
@@ -278,13 +279,12 @@ export default function CurriculumLibrary() {
                       >
                         Duplicate
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-below-basic border-below-basic hover:bg-below-basic/5"
+                      <ConfirmButton
+                        message="Delete this curriculum unit and its indicators? This cannot be undone."
+                        className="h-9 border border-below-basic bg-transparent px-3 text-sm text-below-basic hover:bg-below-basic/5"
                       >
                         Delete
-                      </Button>
+                      </ConfirmButton>
                     </div>
                   </div>
                 )}
